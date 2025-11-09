@@ -1,3 +1,4 @@
+use rand::Rng;
 use std::{io, vec};
 
 fn main() {
@@ -12,6 +13,23 @@ fn main() {
         .parse()
         .expect("구매 금액은 숫자만 입력할 수 있습니다!");
 
+    // 로또 생성하기
+    let lotto_amount = money / 1000;
+
+    let mut rng = rand::thread_rng();
+    let mut lottos: Vec<Vec<i32>> = Vec::new();
+    while lottos.len() != lotto_amount.try_into().unwrap() {
+        let mut vec: Vec<i32> = Vec::new();
+        // 단일 로또 한 장 만들기
+        while vec.len() != 6 {
+            let rand_number = rng.gen_range(1..=45);
+            if vec.contains(&rand_number) {
+                continue;
+            }
+            vec.push(rand_number);
+        }
+        lottos.push(vec); // 이동
+    }
     // 생성된 로또 개수 보여주기
     // 생성된 로또 보여주기
 
