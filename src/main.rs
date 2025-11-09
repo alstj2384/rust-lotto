@@ -28,10 +28,25 @@ fn main() {
             }
             vec.push(rand_number);
         }
+        vec.sort();
         lottos.push(vec); // 이동
     }
+
     // 생성된 로또 개수 보여주기
+    println!("{}개를 구매했습니다.", lottos.len());
+
     // 생성된 로또 보여주기
+    for lotto in &lottos {
+        let joined = lotto
+            .iter()
+            .map(|num| num.to_string())
+            .collect::<Vec<String>>()
+            .join(", ");
+        print!("[");
+        print!("{}", joined);
+        println!("]");
+    }
+    println!();
 
     // 당첨 로또 번호 입력받기
     let mut wining_lotto_numbers = String::new();
