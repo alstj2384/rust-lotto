@@ -169,4 +169,6 @@ fn main() {
     );
 
     // 수익률 출력하기
+    let profit: f64 = sum as f64 / money as f64 * 100.0;
+    println!("총 수익률은 {:.1}%입니다.", profit)
 }
