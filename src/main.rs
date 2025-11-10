@@ -6,12 +6,21 @@ fn main() {
     let mut money = String::new();
     io::stdin()
         .read_line(&mut money)
-        .expect("구매 금액이 잘못되었습니다!");
+        .expect("[ERROR] 구매 금액이 잘못되었습니다!");
 
     let money: i32 = money
         .trim()
         .parse()
-        .expect("구매 금액은 숫자만 입력할 수 있습니다!");
+        .expect("[ERROR] 구매 금액은 숫자만 입력할 수 있습니다!");
+
+    // 금액 범위 확인하기
+    if money <= 0 || money > 1_000_000_000 {
+        panic!("[ERROR] 구매 금액은 0원부터 10억 사이여야 합니다.");
+    }
+    // 구매 금액 단위 확인하기
+    if money % 1000 != 0 {
+        panic!("[ERROR] 구매 금액은 1,000원 단위여야 합니다.");
+    }
 
     // 로또 생성하기
     let lotto_amount = money / 1000;
@@ -53,7 +62,7 @@ fn main() {
     let mut wining_lotto_numbers = String::new();
     io::stdin()
         .read_line(&mut wining_lotto_numbers)
-        .expect("입력이 잘못되었습니다.");
+        .expect("[ERROR] 입력이 잘못되었습니다.");
 
     let lotto_numbers = wining_lotto_numbers.split(",");
 
@@ -64,22 +73,48 @@ fn main() {
             number
                 .trim()
                 .parse()
-                .expect("로또 번호는 숫자만 입력해야 합니다."),
+                .expect("[ERROR] 로또 번호는 숫자만 입력해야 합니다."),
         );
     }
-    println!("");
+
+    if lotto_numbers_vec.len() != 6 {
+        panic!("로또 번호는 6개여야 합니다.");
+    }
+
+    for number in &lotto_numbers_vec {
+        if number < &1 || number > &45 {
+            panic!("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.");
+        }
+    }
+
+    for i in 0..6 {
+        for j in i + 1..6 {
+            if lotto_numbers_vec.get(i) == lotto_numbers_vec.get(j) {
+                panic!("[ERROR] 로또 번호는 중복될 수 없습니다.");
+            }
+        }
+    }
 
     // 보너스 번호 입력받기
     println!("보너스 번호를 입력해 주세요.");
     let mut bonus_number = String::new();
     io::stdin()
         .read_line(&mut bonus_number)
-        .expect("입력이 잘못되었습니다.");
+        .expect("[ERROR] 입력이 잘못되었습니다.");
 
     let bonus_number: i32 = bonus_number
         .trim()
         .parse()
-        .expect("보너스 번호는 숫자만 입력해야 합니다.");
+        .expect("[ERROR] 보너스 번호는 숫자만 입력해야 합니다.");
+
+    if bonus_number < 1 || bonus_number > 45 {
+        panic!("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.");
+    }
+
+    if lotto_numbers_vec.contains(&bonus_number) {
+        panic!("[ERROR] 보너스 번호는 로또 번호와 중복될 수 없습니다.");
+    }
+
     println!();
 
     // 결과를 출력하기
