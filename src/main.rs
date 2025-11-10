@@ -2,25 +2,18 @@ use rand::Rng;
 use std::io;
 
 fn main() {
-    // 구매할 로또 금액 입력받기
-    let mut money = String::new();
-    io::stdin()
-        .read_line(&mut money)
-        .expect("[ERROR] 구매 금액이 잘못되었습니다!");
-
-    let money: i32 = money
-        .trim()
-        .parse()
-        .expect("[ERROR] 구매 금액은 숫자만 입력할 수 있습니다!");
-
-    // 금액 범위 확인하기
-    if money <= 0 || money > 1_000_000_000 {
-        panic!("[ERROR] 구매 금액은 0원부터 10억 사이여야 합니다.");
-    }
-    // 구매 금액 단위 확인하기
-    if money % 1000 != 0 {
-        panic!("[ERROR] 구매 금액은 1,000원 단위여야 합니다.");
-    }
+    // 구매할 로또 금액 입력받
+    let money = loop {
+        let result = input_purchase_amount();
+        match result {
+            Ok(value) => {
+                break value;
+            }
+            Err(e) => {
+                println!("{}", e);
+            }
+        }
+    };
 
     // 로또 생성하기
     let lotto_amount = money / 1000;
@@ -58,63 +51,30 @@ fn main() {
     println!();
 
     // 당첨 로또 번호 입력받기
-    println!("당첨 번호를 입력해 주세요.");
-    let mut wining_lotto_numbers = String::new();
-    io::stdin()
-        .read_line(&mut wining_lotto_numbers)
-        .expect("[ERROR] 입력이 잘못되었습니다.");
-
-    let lotto_numbers = wining_lotto_numbers.split(",");
-
-    let mut lotto_numbers_vec: Vec<i32> = Vec::new();
-
-    for number in lotto_numbers {
-        lotto_numbers_vec.push(
-            number
-                .trim()
-                .parse()
-                .expect("[ERROR] 로또 번호는 숫자만 입력해야 합니다."),
-        );
-    }
-
-    if lotto_numbers_vec.len() != 6 {
-        panic!("로또 번호는 6개여야 합니다.");
-    }
-
-    for number in &lotto_numbers_vec {
-        if number < &1 || number > &45 {
-            panic!("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.");
-        }
-    }
-
-    for i in 0..6 {
-        for j in i + 1..6 {
-            if lotto_numbers_vec.get(i) == lotto_numbers_vec.get(j) {
-                panic!("[ERROR] 로또 번호는 중복될 수 없습니다.");
+    let winning_numbers = loop {
+        let result = input_winning_lotto();
+        match result {
+            Ok(value) => {
+                break value;
+            }
+            Err(e) => {
+                println!("{}", e);
             }
         }
-    }
+    };
 
     // 보너스 번호 입력받기
-    println!("보너스 번호를 입력해 주세요.");
-    let mut bonus_number = String::new();
-    io::stdin()
-        .read_line(&mut bonus_number)
-        .expect("[ERROR] 입력이 잘못되었습니다.");
-
-    let bonus_number: i32 = bonus_number
-        .trim()
-        .parse()
-        .expect("[ERROR] 보너스 번호는 숫자만 입력해야 합니다.");
-
-    if bonus_number < 1 || bonus_number > 45 {
-        panic!("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.");
-    }
-
-    if lotto_numbers_vec.contains(&bonus_number) {
-        panic!("[ERROR] 보너스 번호는 로또 번호와 중복될 수 없습니다.");
-    }
-
+    let bonus_number = loop {
+        let result = input_bonus_lotto(&winning_numbers);
+        match result {
+            Ok(value) => {
+                break value;
+            }
+            Err(e) => {
+                println!("{}", e);
+            }
+        }
+    };
     println!();
 
     // 결과를 출력하기
@@ -128,7 +88,7 @@ fn main() {
     for lotto in lottos {
         let mut count = 0;
         let mut is_bonus_correct = false;
-        for number in &lotto_numbers_vec {
+        for number in &winning_numbers {
             if lotto.contains(&number) {
                 count += 1;
             }
@@ -206,4 +166,90 @@ fn main() {
     // 수익률 출력하기
     let profit: f64 = sum as f64 / money as f64 * 100.0;
     println!("총 수익률은 {:.1}%입니다.", profit)
+}
+
+fn input_purchase_amount() -> Result<i32, String> {
+    let mut input = String::new();
+    if let Err(_e) = io::stdin().read_line(&mut input) {
+        return Err("[ERROR] 잘못된 입력입니다.".to_string());
+    }
+
+    let money: i32 = match input.trim().parse::<i32>() {
+        Ok(value) => value,
+        Err(_e) => {
+            return Err("[ERROR] 구매 금액은 숫자만 입력할 수 있습니다.".to_string());
+        }
+    };
+
+    if money <= 0 || money > 1_000_000_000 {
+        return Err("[ERROR] 구매 금액은 0원부터 10억 사이여야 합니다.".to_string());
+    }
+
+    if money % 1000 != 0 {
+        return Err("[ERROR] 구매 금액은 1000원 단위여야 합니다.".to_string());
+    }
+
+    Ok(money)
+}
+
+fn input_winning_lotto() -> Result<Vec<i32>, String> {
+    println!("당첨 번호를 입력해 주세요.");
+    let mut input = String::new();
+    if let Err(_e) = io::stdin().read_line(&mut input) {
+        return Err("[ERROR] 잘못된 입력입니다.".to_string());
+    }
+
+    let parsed = input.split(",");
+
+    let mut lotto_numbers: Vec<i32> = Vec::new();
+
+    for number in parsed {
+        match number.trim().parse() {
+            Ok(value) => lotto_numbers.push(value),
+            Err(_e) => return Err("[ERROR] 로또 번호는 숫자여야 합니다.".to_string()),
+        }
+    }
+
+    if lotto_numbers.len() != 6 {
+        return Err("로또 번호는 6개여야 합니다.".to_string());
+    }
+
+    for number in &lotto_numbers {
+        if number < &1 || number > &45 {
+            return Err("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.".to_string());
+        }
+    }
+
+    for i in 0..lotto_numbers.len() {
+        for j in i + 1..lotto_numbers.len() {
+            if lotto_numbers.get(i) == lotto_numbers.get(j) {
+                return Err("[ERROR] 로또 번호는 중복될 수 없습니다.".to_string());
+            }
+        }
+    }
+
+    return Ok(lotto_numbers);
+}
+
+fn input_bonus_lotto(winning_numbers: &Vec<i32>) -> Result<i32, String> {
+    println!("보너스 번호를 입력해 주세요.");
+    let mut input = String::new();
+    if let Err(_e) = io::stdin().read_line(&mut input) {
+        return Err("[ERROR] 잘못된 입력입니다.".to_string());
+    }
+
+    let bonus_number = match input.trim().parse::<i32>() {
+        Ok(value) => value,
+        Err(_e) => return Err("[ERROR] 보너스 번호는 숫자만 입력해야 합니다.".to_string()),
+    };
+
+    if bonus_number < 1 || bonus_number > 45 {
+        return Err("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.".to_string());
+    }
+
+    if winning_numbers.contains(&bonus_number) {
+        return Err("[ERROR] 보너스 번호는 로또 번호와 중복될 수 없습니다.".to_string());
+    }
+
+    return Ok(bonus_number);
 }
