@@ -24,10 +24,6 @@ impl Lotto {
         joined
     }
 
-    fn contains(&self, number: &i32) -> bool {
-        self.lotto_numbers.contains(number)
-    }
-
     fn generate_by_random() -> Lotto {
         let mut rng = rand::thread_rng();
         let mut vec: Vec<i32> = Vec::new();
@@ -41,25 +37,86 @@ impl Lotto {
         vec.sort();
         Lotto { lotto_numbers: vec }
     }
-}
+    fn contains(&self, number: &i32) -> bool {
+        self.lotto_numbers.contains(number)
+    }
 
-struct WinningLotto {
-    winning_numbers: Vec<i32>,
-    bonus_number: i32,
-}
-
-impl WinningLotto {
-    fn get_result(&self, lotto: Lotto) -> (i32, bool) {
+    fn get_count(&self, lotto: &Lotto) -> i32 {
         let mut count = 0;
-        let mut is_bonus_correct = false;
-        for number in &self.winning_numbers {
-            if lotto.contains(&number) {
+        for target in &lotto.lotto_numbers {
+            if self.contains(target) {
                 count += 1;
             }
         }
-        if lotto.contains(&self.bonus_number) {
-            is_bonus_correct = true;
+        count
+    }
+
+    fn new(lotto_numbers: Vec<i32>) -> Result<Lotto, String> {
+        if lotto_numbers.len() != 6 {
+            return Err("로또 번호는 6개여야 합니다.".to_string());
         }
+
+        for number in &lotto_numbers {
+            if number < &1 || number > &45 {
+                return Err("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.".to_string());
+            }
+        }
+
+        for i in 0..lotto_numbers.len() {
+            for j in i + 1..lotto_numbers.len() {
+                if lotto_numbers.get(i) == lotto_numbers.get(j) {
+                    return Err("[ERROR] 로또 번호는 중복될 수 없습니다.".to_string());
+                }
+            }
+        }
+
+        Ok(Lotto {
+            lotto_numbers: lotto_numbers,
+        })
+    }
+}
+
+struct WinningLotto {
+    winning_numbers: Lotto,
+    bonus_number: BonusNumber,
+}
+
+struct BonusNumber {
+    bonus_number: i32,
+}
+
+impl BonusNumber {
+    fn new(bonus_number: i32) -> Result<BonusNumber, String> {
+        if bonus_number < 1 || bonus_number > 45 {
+            return Err("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.".to_string());
+        }
+        Ok(BonusNumber {
+            bonus_number: bonus_number,
+        })
+    }
+
+    fn bonus_number(&self) -> &i32 {
+        &self.bonus_number
+    }
+}
+
+impl WinningLotto {
+    fn new(lotto: Lotto, bonus_number: BonusNumber) -> Result<WinningLotto, String> {
+        if lotto.contains(bonus_number.bonus_number()) {
+            return Err("[ERROR] 보너스 번호는 로또 번호와 중복될 수 없습니다.".to_string());
+        }
+        Ok(WinningLotto {
+            winning_numbers: lotto,
+            bonus_number: bonus_number,
+        })
+    }
+
+    fn get_result(&self, lotto: Lotto) -> (i32, bool) {
+        let count = self.winning_numbers.get_count(&lotto);
+        let is_bonus_correct = self
+            .winning_numbers
+            .contains(self.bonus_number.bonus_number());
+
         (count, is_bonus_correct)
     }
 }
@@ -96,37 +153,39 @@ fn main() {
     }
     println!();
 
-    // 당첨 로또 번호 입력받기
-    let winning_numbers = loop {
-        let result = input_winning_lotto();
-        match result {
-            Ok(value) => {
-                break value;
+    let winning_lotto = loop {
+        // 당첨 로또 번호 입력받기
+        let winning_numbers = loop {
+            let result = input_winning_lotto();
+            match result {
+                Ok(value) => {
+                    break value;
+                }
+                Err(e) => {
+                    println!("{}", e);
+                }
             }
-            Err(e) => {
-                println!("{}", e);
+        };
+
+        // 보너스 번호 입력받기
+        let winning_lotto = loop {
+            let result = input_bonus_lotto();
+
+            match result {
+                Ok(value) => {
+                    break value;
+                }
+                Err(e) => {
+                    println!("{}", e)
+                }
             }
+        };
+
+        match WinningLotto::new(winning_numbers, winning_lotto) {
+            Ok(value) => break value,
+            Err(_e) => println!("{}", _e),
         }
     };
-
-    // 보너스 번호 입력받기
-    let bonus_number = loop {
-        let result = input_bonus_lotto(&winning_numbers);
-        match result {
-            Ok(value) => {
-                break value;
-            }
-            Err(e) => {
-                println!("{}", e);
-            }
-        }
-    };
-
-    let winning_lotto = WinningLotto {
-        winning_numbers: winning_numbers,
-        bonus_number: bonus_number,
-    };
-
     println!();
 
     // 결과를 출력하기
@@ -236,7 +295,7 @@ fn input_purchase_amount() -> Result<i32, String> {
     Ok(money)
 }
 
-fn input_winning_lotto() -> Result<Vec<i32>, String> {
+fn input_winning_lotto() -> Result<Lotto, String> {
     println!("당첨 번호를 입력해 주세요.");
     let mut input = String::new();
     if let Err(_e) = io::stdin().read_line(&mut input) {
@@ -254,28 +313,13 @@ fn input_winning_lotto() -> Result<Vec<i32>, String> {
         }
     }
 
-    if lotto_numbers.len() != 6 {
-        return Err("로또 번호는 6개여야 합니다.".to_string());
+    match Lotto::new(lotto_numbers) {
+        Ok(value) => Ok(value),
+        Err(_e) => Err(_e),
     }
-
-    for number in &lotto_numbers {
-        if number < &1 || number > &45 {
-            return Err("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.".to_string());
-        }
-    }
-
-    for i in 0..lotto_numbers.len() {
-        for j in i + 1..lotto_numbers.len() {
-            if lotto_numbers.get(i) == lotto_numbers.get(j) {
-                return Err("[ERROR] 로또 번호는 중복될 수 없습니다.".to_string());
-            }
-        }
-    }
-
-    return Ok(lotto_numbers);
 }
 
-fn input_bonus_lotto(winning_numbers: &Vec<i32>) -> Result<i32, String> {
+fn input_bonus_lotto() -> Result<BonusNumber, String> {
     println!("보너스 번호를 입력해 주세요.");
     let mut input = String::new();
     if let Err(_e) = io::stdin().read_line(&mut input) {
@@ -287,13 +331,8 @@ fn input_bonus_lotto(winning_numbers: &Vec<i32>) -> Result<i32, String> {
         Err(_e) => return Err("[ERROR] 보너스 번호는 숫자만 입력해야 합니다.".to_string()),
     };
 
-    if bonus_number < 1 || bonus_number > 45 {
-        return Err("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.".to_string());
+    match BonusNumber::new(bonus_number) {
+        Ok(value) => Ok(value),
+        Err(_e) => Err(_e),
     }
-
-    if winning_numbers.contains(&bonus_number) {
-        return Err("[ERROR] 보너스 번호는 로또 번호와 중복될 수 없습니다.".to_string());
-    }
-
-    return Ok(bonus_number);
 }
