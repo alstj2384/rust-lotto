@@ -1,8 +1,36 @@
 use rand::Rng;
+use std::fmt::Display;
 use std::io;
+struct Lotto {
+    lotto_numbers: Vec<i32>,
+}
+
+impl Display for Lotto {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let joined = self.join_by_delimiter();
+        write!(f, "[{}]", joined)
+    }
+}
+
+impl Lotto {
+    fn join_by_delimiter(&self) -> String {
+        let joined = self
+            .lotto_numbers
+            .iter()
+            .map(|num| num.to_string())
+            .collect::<Vec<String>>()
+            .join(", ");
+
+        joined
+    }
+
+    fn contains(&self, number: &i32) -> bool {
+        self.lotto_numbers.contains(number)
+    }
+}
 
 fn main() {
-    // 구매할 로또 금액 입력받
+    // 구매할 로또 금액 입력받기
     let money = loop {
         let result = input_purchase_amount();
         match result {
@@ -14,12 +42,14 @@ fn main() {
             }
         }
     };
+    println!();
 
     // 로또 생성하기
     let lotto_amount = money / 1000;
 
     let mut rng = rand::thread_rng();
-    let mut lottos: Vec<Vec<i32>> = Vec::new();
+    // let mut lottos: Vec<Vec<i32>> = Vec::new();
+    let mut lottos: Vec<Lotto> = Vec::new();
     while lottos.len() != lotto_amount.try_into().unwrap() {
         let mut vec: Vec<i32> = Vec::new();
         // 단일 로또 한 장 만들기
@@ -31,7 +61,7 @@ fn main() {
             vec.push(rand_number);
         }
         vec.sort();
-        lottos.push(vec); // 이동
+        lottos.push(Lotto { lotto_numbers: vec }); // 이동
     }
 
     // 생성된 로또 개수 보여주기
@@ -39,14 +69,7 @@ fn main() {
 
     // 생성된 로또 보여주기
     for lotto in &lottos {
-        let joined = lotto
-            .iter()
-            .map(|num| num.to_string())
-            .collect::<Vec<String>>()
-            .join(", ");
-        print!("[");
-        print!("{}", joined);
-        println!("]");
+        println!("{}", lotto)
     }
     println!();
 
@@ -169,6 +192,7 @@ fn main() {
 }
 
 fn input_purchase_amount() -> Result<i32, String> {
+    println!("구매금액을 입력해 주세요.");
     let mut input = String::new();
     if let Err(_e) = io::stdin().read_line(&mut input) {
         return Err("[ERROR] 잘못된 입력입니다.".to_string());
