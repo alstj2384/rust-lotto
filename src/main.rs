@@ -43,6 +43,27 @@ impl Lotto {
     }
 }
 
+struct WinningLotto {
+    winning_numbers: Vec<i32>,
+    bonus_number: i32,
+}
+
+impl WinningLotto {
+    fn get_result(&self, lotto: Lotto) -> (i32, bool) {
+        let mut count = 0;
+        let mut is_bonus_correct = false;
+        for number in &self.winning_numbers {
+            if lotto.contains(&number) {
+                count += 1;
+            }
+        }
+        if lotto.contains(&self.bonus_number) {
+            is_bonus_correct = true;
+        }
+        (count, is_bonus_correct)
+    }
+}
+
 fn main() {
     // 구매할 로또 금액 입력받기
     let money = loop {
@@ -61,10 +82,9 @@ fn main() {
     // 로또 생성하기
     let lotto_amount = money / 1000;
 
-    // let mut lottos: Vec<Vec<i32>> = Vec::new();
     let mut lottos: Vec<Lotto> = Vec::new();
     while lottos.len() != lotto_amount.try_into().unwrap() {
-        lottos.push(Lotto::generate_by_random()); // 이동
+        lottos.push(Lotto::generate_by_random());
     }
 
     // 생성된 로또 개수 보여주기
@@ -101,6 +121,12 @@ fn main() {
             }
         }
     };
+
+    let winning_lotto = WinningLotto {
+        winning_numbers: winning_numbers,
+        bonus_number: bonus_number,
+    };
+
     println!();
 
     // 결과를 출력하기
@@ -112,16 +138,7 @@ fn main() {
 
     // 1. 로또 번호들과 기본 번호 + 당첨 번호를 비교하기
     for lotto in lottos {
-        let mut count = 0;
-        let mut is_bonus_correct = false;
-        for number in &winning_numbers {
-            if lotto.contains(&number) {
-                count += 1;
-            }
-        }
-        if lotto.contains(&bonus_number) {
-            is_bonus_correct = true;
-        }
+        let (count, is_bonus_correct) = winning_lotto.get_result(lotto);
 
         if count == 6 {
             sum += 2_000_000_000;
