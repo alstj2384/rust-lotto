@@ -27,6 +27,20 @@ impl Lotto {
     fn contains(&self, number: &i32) -> bool {
         self.lotto_numbers.contains(number)
     }
+
+    fn generate_by_random() -> Lotto {
+        let mut rng = rand::thread_rng();
+        let mut vec: Vec<i32> = Vec::new();
+        while vec.len() != 6 {
+            let rand_number = rng.gen_range(1..=45);
+            if vec.contains(&rand_number) {
+                continue;
+            }
+            vec.push(rand_number);
+        }
+        vec.sort();
+        Lotto { lotto_numbers: vec }
+    }
 }
 
 fn main() {
@@ -47,21 +61,10 @@ fn main() {
     // 로또 생성하기
     let lotto_amount = money / 1000;
 
-    let mut rng = rand::thread_rng();
     // let mut lottos: Vec<Vec<i32>> = Vec::new();
     let mut lottos: Vec<Lotto> = Vec::new();
     while lottos.len() != lotto_amount.try_into().unwrap() {
-        let mut vec: Vec<i32> = Vec::new();
-        // 단일 로또 한 장 만들기
-        while vec.len() != 6 {
-            let rand_number = rng.gen_range(1..=45);
-            if vec.contains(&rand_number) {
-                continue;
-            }
-            vec.push(rand_number);
-        }
-        vec.sort();
-        lottos.push(Lotto { lotto_numbers: vec }); // 이동
+        lottos.push(Lotto::generate_by_random()); // 이동
     }
 
     // 생성된 로또 개수 보여주기
