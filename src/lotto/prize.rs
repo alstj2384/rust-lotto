@@ -25,14 +25,14 @@ impl Prize {
         }
     }
 
-    pub fn get_sum(prize: Prize, count: i32) -> u64 {
+    pub fn get_sum(prize: &Prize, count: &i32) -> i32 {
         match prize {
-            Prize::First => 2_000_000_000 * count as u64,
-            Prize::Second => 30_000_000 * count as u64,
-            Prize::Third => 1_500_000 * count as u64,
-            Prize::Fourth => 50_000 * count as u64,
-            Prize::Fifth => 5_000 * count as u64,
-            Prize::None => 0 as u64,
+            Prize::First => 2_000_000_000 * count,
+            Prize::Second => 30_000_000 * count,
+            Prize::Third => 1_500_000 * count,
+            Prize::Fourth => 50_000 * count,
+            Prize::Fifth => 5_000 * count,
+            Prize::None => 0,
         }
     }
 }
