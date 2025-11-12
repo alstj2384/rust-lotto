@@ -121,6 +121,33 @@ impl WinningLotto {
         (count, is_bonus_correct)
     }
 }
+#[derive(Eq, Hash, PartialEq)]
+enum Prize {
+    First,
+    Second,
+    Third,
+    Fourth,
+    Fifth,
+    None,
+}
+
+impl Prize {
+    fn get_prize(match_count: i32, is_bonus_correct: bool) -> Prize {
+        if match_count == 6 {
+            return Prize::First;
+        } else if match_count == 5 && is_bonus_correct {
+            return Prize::Second;
+        } else if match_count == 5 {
+            return Prize::Third;
+        } else if match_count == 4 {
+            return Prize::Fourth;
+        } else if match_count == 3 {
+            return Prize::Fifth;
+        } else {
+            return Prize::None;
+        }
+    }
+}
 
 fn main() {
     // 구매할 로또 금액 입력받기
@@ -191,25 +218,15 @@ fn main() {
 
     // 결과를 출력하기
 
-    let mut result: HashMap<String, i32> = HashMap::new();
+    let mut result: HashMap<Prize, i32> = HashMap::new();
     // 1. 로또 번호들과 기본 번호 + 당첨 번호를 비교하기
     for lotto in lottos {
         let (match_count, is_bonus_correct) = winning_lotto.get_result(lotto);
-        let count;
-        if match_count == 6 {
-            count = result.entry("first_prize".to_string()).or_insert(0);
-        } else if match_count == 5 && is_bonus_correct {
-            count = result.entry("second_prize".to_string()).or_insert(0);
-        } else if match_count == 5 {
-            count = result.entry("third_prize".to_string()).or_insert(0);
-        } else if match_count == 4 {
-            count = result.entry("fourth_prize".to_string()).or_insert(0);
-        } else if match_count == 3 {
-            count = result.entry("fifth_prize".to_string()).or_insert(0);
-        } else {
-            count = result.entry("none".to_string()).or_insert(0);
-        }
-        *count += 1;
+
+        let prize = Prize::get_prize(match_count, is_bonus_correct);
+
+        let count = result.entry(prize).or_insert(0);
+        *count += 1
     }
 
     println!("당첨 통계");
@@ -219,31 +236,31 @@ fn main() {
         "{}개 일치 ({}원) - {}개",
         3,
         "5,000",
-        result.get("fifth_prize").unwrap_or(&0)
+        result.get(&Prize::Fifth).unwrap_or(&0)
     );
     println!(
         "{}개 일치 ({}원) - {}개",
         4,
         "50,000",
-        result.get("fourth_prize").unwrap_or(&0)
+        result.get(&Prize::Fourth).unwrap_or(&0)
     );
     println!(
         "{}개 일치 ({}원) - {}개",
         5,
         "1,500,000",
-        result.get("third_prize").unwrap_or(&0)
+        result.get(&Prize::Third).unwrap_or(&0)
     );
     println!(
         "{}개 일치, 보너스 볼 일치 ({}원) - {}개",
         5,
         "30,000,000",
-        result.get("second_prize").unwrap_or(&0)
+        result.get(&Prize::Second).unwrap_or(&0)
     );
     println!(
         "{}개 일치 ({}원) - {}개",
         6,
         "2,000,000,000",
-        result.get("first_prize").unwrap_or(&0)
+        result.get(&Prize::First).unwrap_or(&0)
     );
 
     // 수익률 출력하기
