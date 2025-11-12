@@ -24,7 +24,7 @@ impl Lotto {
         joined
     }
 
-    pub fn generate_by_random() -> Lotto {
+    fn generate_by_random() -> Lotto {
         let mut rng = rand::thread_rng();
         let mut vec: Vec<i32> = Vec::new();
         while vec.len() != 6 {
@@ -73,5 +73,13 @@ impl Lotto {
         Ok(Lotto {
             lotto_numbers: lotto_numbers,
         })
+    }
+
+    pub fn generate_random_lottos(amount: i32) -> Vec<Lotto> {
+        let mut lottos: Vec<Lotto> = Vec::new();
+        while lottos.len() != amount.try_into().unwrap() {
+            lottos.push(Lotto::generate_by_random());
+        }
+        lottos
     }
 }

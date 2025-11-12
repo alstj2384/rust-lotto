@@ -24,11 +24,7 @@ fn main() {
 
     // 로또 생성하기
     let lotto_amount = money / 1000;
-
-    let mut lottos: Vec<Lotto> = Vec::new();
-    while lottos.len() != lotto_amount.try_into().unwrap() {
-        lottos.push(Lotto::generate_by_random());
-    }
+    let lottos = Lotto::generate_random_lottos(lotto_amount);
 
     // 생성된 로또 개수 보여주기
     println!("{}개를 구매했습니다.", lottos.len());
