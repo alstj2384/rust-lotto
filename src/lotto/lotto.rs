@@ -2,7 +2,7 @@ use rand::Rng;
 use std::fmt::Display;
 
 pub struct Lotto {
-    lotto_numbers: Vec<i32>,
+    pub lotto_numbers: Vec<i32>,
 }
 
 impl Lotto {
@@ -44,7 +44,7 @@ impl Lotto {
         count
     }
 
-    pub fn generate_random_lottos(amount: i32) -> Vec<Lotto> {
+    pub fn generate_random_lottos(amount: i64) -> Vec<Lotto> {
         let mut lottos: Vec<Lotto> = Vec::new();
         while lottos.len() != amount.try_into().unwrap() {
             lottos.push(Lotto::generate_by_random());

@@ -4,21 +4,21 @@ use crate::lotto::prize::Prize;
 use std::collections::HashMap;
 use std::io;
 
-pub fn input_purchase_amount() -> Result<i32, String> {
+pub fn input_purchase_amount() -> Result<i64, String> {
     println!("구매금액을 입력해 주세요.");
     let mut input = String::new();
     if let Err(_e) = io::stdin().read_line(&mut input) {
         return Err("[ERROR] 잘못된 입력입니다.".to_string());
     }
 
-    let money: i32 = match input.trim().parse::<i32>() {
+    let money: i64 = match input.trim().parse::<i64>() {
         Ok(value) => value,
         Err(_e) => {
             return Err("[ERROR] 구매 금액은 숫자만 입력할 수 있습니다.".to_string());
         }
     };
 
-    if money <= 0 || money > 1_000_000_000 {
+    if money <= 0 || money > 1_000_000_000_000 {
         return Err("[ERROR] 구매 금액은 0원부터 10억 사이여야 합니다.".to_string());
     }
 
