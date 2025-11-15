@@ -6,11 +6,11 @@ pub struct WinningLotto {
 }
 
 pub struct BonusNumber {
-    bonus_number: i32,
+    bonus_number: i8,
 }
 
 impl BonusNumber {
-    pub fn new(bonus_number: i32) -> Result<BonusNumber, String> {
+    pub fn new(bonus_number: i8) -> Result<BonusNumber, String> {
         if bonus_number < 1 || bonus_number > 45 {
             return Err("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.".to_string());
         }
@@ -19,7 +19,7 @@ impl BonusNumber {
         })
     }
 
-    fn bonus_number(&self) -> &i32 {
+    fn bonus_number(&self) -> &i8 {
         &self.bonus_number
     }
 }

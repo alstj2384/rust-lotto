@@ -36,8 +36,8 @@ fn format_mem(opt: Option<u64>) -> String {
 }
 
 // 벡터 내 요소의 크기 합 구하기
-fn vec_heap_size_i32(v: &Vec<i32>) -> usize {
-    v.capacity() * size_of::<i32>()
+fn vec_heap_size_i32(v: &Vec<i8>) -> usize {
+    v.capacity() * size_of::<i8>()
 }
 
 // Lotto 구조체 자체 크기 + 벡터 내 요소 크기 합 구하기
@@ -103,13 +103,13 @@ fn main() {
     let sec = duration.as_secs_f64();
     println!("생성 소요 시간: {} ms ({} s)", ms, sec);
     // 로또 1개 발행 -> Lotto 구조체(24) + Vec(capacity 8 * 4byte => 32byte) = 56
-    // let used_mem = lotto_vec_runtime_size(&lottos);
-    // println!(
-    //     "Vec<Lotto> 요소 크기(Byte, KB, MB): ({}, {}, {})",
-    //     used_mem,
-    //     used_mem / 1024,
-    //     used_mem / 1024 / 1024
-    // );
+    let used_mem = lotto_vec_runtime_size(&lottos);
+    println!(
+        "Vec<Lotto> 요소 크기(Byte, KB, MB): ({}, {}, {})",
+        used_mem,
+        used_mem / 1024,
+        used_mem / 1024 / 1024
+    );
 
     // Lotto 1개의 크기: 56 Byte
 

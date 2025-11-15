@@ -38,7 +38,7 @@ pub fn input_winning_lotto() -> Result<Lotto, String> {
 
     let parsed = input.split(",");
 
-    let mut lotto_numbers: Vec<i32> = Vec::new();
+    let mut lotto_numbers: Vec<i8> = Vec::new();
 
     for number in parsed {
         match number.trim().parse() {
@@ -60,7 +60,7 @@ pub fn input_bonus_lotto() -> Result<BonusNumber, String> {
         return Err("[ERROR] 잘못된 입력입니다.".to_string());
     }
 
-    let bonus_number = match input.trim().parse::<i32>() {
+    let bonus_number = match input.trim().parse::<i8>() {
         Ok(value) => value,
         Err(_e) => return Err("[ERROR] 보너스 번호는 숫자만 입력해야 합니다.".to_string()),
     };

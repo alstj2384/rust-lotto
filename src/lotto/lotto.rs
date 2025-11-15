@@ -2,11 +2,11 @@ use rand::Rng;
 use std::fmt::Display;
 
 pub struct Lotto {
-    pub lotto_numbers: Vec<i32>,
+    pub lotto_numbers: Vec<i8>,
 }
 
 impl Lotto {
-    pub fn new(lotto_numbers: Vec<i32>) -> Result<Lotto, String> {
+    pub fn new(lotto_numbers: Vec<i8>) -> Result<Lotto, String> {
         if lotto_numbers.len() != 6 {
             return Err("[ERROR] 로또 번호는 6개여야 합니다.".to_string());
         }
@@ -30,7 +30,7 @@ impl Lotto {
         })
     }
 
-    pub fn contains(&self, number: &i32) -> bool {
+    pub fn contains(&self, number: &i8) -> bool {
         self.lotto_numbers.contains(number)
     }
 
@@ -54,7 +54,7 @@ impl Lotto {
 
     fn generate_by_random() -> Lotto {
         let mut rng = rand::thread_rng();
-        let mut vec: Vec<i32> = Vec::new();
+        let mut vec: Vec<i8> = Vec::new();
         while vec.len() != 6 {
             let rand_number = rng.gen_range(1..=45);
             if vec.contains(&rand_number) {
