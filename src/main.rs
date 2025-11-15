@@ -35,23 +35,8 @@ fn format_mem(opt: Option<u64>) -> String {
     }
 }
 
-// 벡터 내 요소의 크기 합 구하기
-fn vec_heap_size_i32(v: &Vec<i8>) -> usize {
-    v.capacity() * size_of::<i8>()
-}
-
-// Lotto 구조체 자체 크기 + 벡터 내 요소 크기 합 구하기
-fn lotto_runtime_size(l: &Lotto) -> usize {
-    size_of::<Lotto>() + vec_heap_size_i32(&l.lotto_numbers)
-}
-
-// Vec<Lotto> 내부 요소의 전체 크기 구하기
-fn lotto_vec_runtime_size(v: &Vec<Lotto>) -> usize {
-    v.iter().map(|l| lotto_runtime_size(l)).sum()
-}
-
-fn get_max_purchase_amount(free_memory: u64, padding: u64, lotto_price: u64) -> u64 {
-    free_memory / 1024 * padding / 100 * 13 * lotto_price
+fn get_max_purchase_amount(free_memory: u64, size: u64, padding: u64, lotto_price: u64) -> u64 {
+    free_memory / size * padding / 100 * lotto_price
 }
 
 fn main() {
@@ -67,11 +52,11 @@ fn main() {
     // println!("Swap Limit: {}", format_mem(swap_limit));
 
     // 구조체 Struct 크기
-    // println!("{}", size_of::<Lotto>()); // 24Byte(pointer(8) + length(8) + capacity(8))
-    // println!("{}", size_of::<WinningLotto>()); // 32Byte()
+    // println!("{}", size_of::<Lotto>()); // 6 byte
+    // println!("{}", size_of::<Vec<Lotto>>()); // 24Byte(pointer(8) + length(8) + capacity(8))
 
     let max_bound = match mem_limit {
-        Some(value) => get_max_purchase_amount(value, 80, 1000),
+        Some(value) => get_max_purchase_amount(value, size_of::<Lotto>() as u64, 80, 1000),
         None => 0,
     };
 
@@ -97,19 +82,11 @@ fn main() {
 
     show_purchased_lotto_amount(&lottos);
     // 출력 개수가 많은 관계로 임시적으로 출력 비활성화
-    show_purchased_lotto(&lottos);
+    // show_purchased_lotto(&lottos);
 
     let ms = duration.as_millis();
     let sec = duration.as_secs_f64();
     println!("생성 소요 시간: {} ms ({} s)", ms, sec);
-    // 로또 1개 발행 -> Lotto 구조체(24) + Vec(capacity 8 * 4byte => 32byte) = 56
-    let used_mem = lotto_vec_runtime_size(&lottos);
-    println!(
-        "Vec<Lotto> 요소 크기(Byte, KB, MB): ({}, {}, {})",
-        used_mem,
-        used_mem / 1024,
-        used_mem / 1024 / 1024
-    );
 
     // Lotto 1개의 크기: 56 Byte
 
@@ -131,20 +108,20 @@ fn main() {
     //     format_mem(swap_current)
     // );
 
-    let winning_lotto = input_winning_lotto();
+    // let winning_lotto = input_winning_lotto();
 
-    let mut result: HashMap<Prize, i32> = HashMap::new();
-    for lotto in lottos {
-        let (match_count, is_bonus_correct) = winning_lotto.get_result(lotto);
+    // let mut result: HashMap<Prize, i32> = HashMap::new();
+    // for lotto in lottos {
+    //     let (match_count, is_bonus_correct) = winning_lotto.get_result(lotto);
 
-        let prize = Prize::get_prize(match_count, is_bonus_correct);
+    //     let prize = Prize::get_prize(match_count, is_bonus_correct);
 
-        let count = result.entry(prize).or_insert(0);
-        *count += 1
-    }
+    //     let count = result.entry(prize).or_insert(0);
+    //     *count += 1
+    // }
 
-    io::show_result(&result);
-    io::show_profit_rate(&result, money as f64);
+    // io::show_result(&result);
+    // io::show_profit_rate(&result, money as f64);
 }
 
 fn input_purchase_amount() -> i64 {

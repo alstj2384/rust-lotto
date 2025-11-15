@@ -38,13 +38,16 @@ pub fn input_winning_lotto() -> Result<Lotto, String> {
 
     let parsed = input.split(",");
 
-    let mut lotto_numbers: Vec<i8> = Vec::new();
+    // let mut lotto_numbers: Vec<i8> = Vec::new();
+    let mut lotto_numbers = [0i8; 6];
 
+    let mut i = 0;
     for number in parsed {
         match number.trim().parse() {
-            Ok(value) => lotto_numbers.push(value),
+            Ok(value) => lotto_numbers[i] = value,
             Err(_e) => return Err("[ERROR] 로또 번호는 숫자여야 합니다.".to_string()),
         }
+        i += 1;
     }
 
     match Lotto::new(lotto_numbers) {
