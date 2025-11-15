@@ -72,11 +72,11 @@ pub fn input_bonus_lotto() -> Result<BonusNumber, String> {
     }
 }
 
-pub fn show_purchased_lotto_amount(lottos: &Vec<Box<Lotto>>) {
+pub fn show_purchased_lotto_amount(lottos: &Vec<Lotto>) {
     println!("{}개를 구매했습니다.", lottos.len());
 }
 
-pub fn show_purchased_lotto(lottos: &Vec<Box<Lotto>>) {
+pub fn show_purchased_lotto(lottos: &Vec<Lotto>) {
     for lotto in lottos {
         println!("{}", *lotto)
     }

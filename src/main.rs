@@ -46,7 +46,7 @@ fn lotto_runtime_size(l: &Lotto) -> usize {
 }
 
 // Vec<Lotto> 내부 요소의 전체 크기 구하기
-fn lotto_vec_runtime_size(v: &Vec<Box<Lotto>>) -> usize {
+fn lotto_vec_runtime_size(v: &Vec<Lotto>) -> usize {
     v.iter().map(|l| lotto_runtime_size(l)).sum()
 }
 
@@ -135,7 +135,7 @@ fn main() {
 
     let mut result: HashMap<Prize, i32> = HashMap::new();
     for lotto in lottos {
-        let (match_count, is_bonus_correct) = winning_lotto.get_result(*lotto);
+        let (match_count, is_bonus_correct) = winning_lotto.get_result(lotto);
 
         let prize = Prize::get_prize(match_count, is_bonus_correct);
 
