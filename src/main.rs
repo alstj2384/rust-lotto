@@ -46,7 +46,7 @@ fn lotto_runtime_size(l: &Lotto) -> usize {
 }
 
 // Vec<Lotto> 내부 요소의 전체 크기 구하기
-fn lotto_vec_runtime_size(v: &Vec<Lotto>) -> usize {
+fn lotto_vec_runtime_size(v: &Vec<Box<Lotto>>) -> usize {
     v.iter().map(|l| lotto_runtime_size(l)).sum()
 }
 
@@ -113,16 +113,16 @@ fn main() {
 
     // Lotto 1개의 크기: 56 Byte
 
-    println!("spend money: {}원({}개의 인스턴스)", money, money / 1000);
+    // println!("spend money: {}원({}개의 인스턴스)", money, money / 1000);
     // 객체 생성 이후 사용한 메모리 공간
-    let mem_used = read_value("/sys/fs/cgroup/memory.current");
-    println!("Memory Used:   {}", format_mem(mem_used));
+    // let mem_used = read_value("/sys/fs/cgroup/memory.current");
+    // println!("Memory Used:   {}", format_mem(mem_used));
 
     // 객체 생성 이후 남은 메모리 공간
-    println!(
-        "Memory left:   {}",
-        format_mem(Option::Some(mem_limit.unwrap() - mem_used.unwrap()))
-    );
+    // println!(
+    //     "Memory left:   {}",
+    //     format_mem(Option::Some(mem_limit.unwrap() - mem_used.unwrap()))
+    // );
 
     // let swap_current = read_value("/sys/fs/cgroup/memory.swap.current");
 
@@ -131,20 +131,20 @@ fn main() {
     //     format_mem(swap_current)
     // );
 
-    // let winning_lotto = input_winning_lotto();
+    let winning_lotto = input_winning_lotto();
 
-    // let mut result: HashMap<Prize, i32> = HashMap::new();
-    // for lotto in lottos {
-    //     let (match_count, is_bonus_correct) = winning_lotto.get_result(lotto);
+    let mut result: HashMap<Prize, i32> = HashMap::new();
+    for lotto in lottos {
+        let (match_count, is_bonus_correct) = winning_lotto.get_result(*lotto);
 
-    //     let prize = Prize::get_prize(match_count, is_bonus_correct);
+        let prize = Prize::get_prize(match_count, is_bonus_correct);
 
-    //     let count = result.entry(prize).or_insert(0);
-    //     *count += 1
-    // }
+        let count = result.entry(prize).or_insert(0);
+        *count += 1
+    }
 
-    // io::show_result(&result);
-    // io::show_profit_rate(&result, money as f64);
+    io::show_result(&result);
+    io::show_profit_rate(&result, money as f64);
 }
 
 fn input_purchase_amount() -> i64 {
