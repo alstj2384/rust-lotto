@@ -97,7 +97,7 @@ fn main() {
 
     show_purchased_lotto_amount(&lottos);
     // 출력 개수가 많은 관계로 임시적으로 출력 비활성화
-    // show_purchased_lotto(&lottos);
+    show_purchased_lotto(&lottos);
 
     let ms = duration.as_millis();
     let sec = duration.as_secs_f64();
@@ -113,16 +113,16 @@ fn main() {
 
     // Lotto 1개의 크기: 56 Byte
 
-    // println!("spend money: {}원({}개의 인스턴스)", money, money / 1000);
+    println!("spend money: {}원({}개의 인스턴스)", money, money / 1000);
     // 객체 생성 이후 사용한 메모리 공간
-    // let mem_used = read_value("/sys/fs/cgroup/memory.current");
-    // println!("Memory Used:   {}", format_mem(mem_used));
+    let mem_used = read_value("/sys/fs/cgroup/memory.current");
+    println!("Memory Used:   {}", format_mem(mem_used));
 
     // 객체 생성 이후 남은 메모리 공간
-    // println!(
-    //     "Memory left:   {}",
-    //     format_mem(Option::Some(mem_limit.unwrap() - mem_used.unwrap()))
-    // );
+    println!(
+        "Memory left:   {}",
+        format_mem(Option::Some(mem_limit.unwrap() - mem_used.unwrap()))
+    );
 
     // let swap_current = read_value("/sys/fs/cgroup/memory.swap.current");
 
