@@ -18,7 +18,7 @@ pub fn input_purchase_amount() -> Result<i64, String> {
         }
     };
 
-    if money <= 0 || money > 1_000_000_000_000 {
+    if money <= 0 || money > 1_000_000_000_000_000 {
         return Err("[ERROR] 구매 금액은 0원부터 10억 사이여야 합니다.".to_string());
     }
 
@@ -36,13 +36,10 @@ pub fn input_winning_lotto() -> Result<Lotto, String> {
         return Err("[ERROR] 잘못된 입력입니다.".to_string());
     }
 
-    let parsed: Vec<&str> = input.trim().split(",").collect();
+    let parsed = input.split(",");
 
+    // let mut lotto_numbers: Vec<i8> = Vec::new();
     let mut lotto_numbers = [0i8; 6];
-
-    if parsed.len() != 6 {
-        return Err("[ERROR] 로또 번호는 6개여야 합니다.".to_string());
-    }
 
     let mut i = 0;
     for number in parsed {
@@ -66,7 +63,7 @@ pub fn input_bonus_lotto() -> Result<BonusNumber, String> {
         return Err("[ERROR] 잘못된 입력입니다.".to_string());
     }
 
-    let bonus_number = match input.trim().parse::<i64>() {
+    let bonus_number = match input.trim().parse::<i8>() {
         Ok(value) => value,
         Err(_e) => return Err("[ERROR] 보너스 번호는 숫자만 입력해야 합니다.".to_string()),
     };
