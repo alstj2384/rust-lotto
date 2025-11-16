@@ -9,7 +9,7 @@ pub enum Prize {
 }
 
 impl Prize {
-    pub fn get_prize(match_count: i32, is_bonus_correct: bool) -> Prize {
+    pub fn get_prize(match_count: u32, is_bonus_correct: bool) -> Prize {
         if match_count == 6 {
             return Prize::First;
         } else if match_count == 5 && is_bonus_correct {

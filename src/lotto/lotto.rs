@@ -2,7 +2,7 @@ use rand::Rng;
 use std::fmt::Display;
 
 pub struct Lotto {
-    pub lotto_numbers: [i8; 6],
+    pub bit_lotto_numbers: i64,
 }
 
 impl Lotto {
@@ -25,23 +25,13 @@ impl Lotto {
             }
         }
 
-        Ok(Lotto {
-            lotto_numbers: lotto_numbers,
-        })
-    }
-
-    pub fn contains(&self, number: &i8) -> bool {
-        self.lotto_numbers.contains(number)
-    }
-
-    pub fn get_count(&self, lotto: &Lotto) -> i32 {
-        let mut count = 0;
-        for target in &lotto.lotto_numbers {
-            if self.contains(target) {
-                count += 1;
-            }
+        let mut bits: i64 = 0;
+        for number in lotto_numbers {
+            bits = bits | (1 << number);
         }
-        count
+        Ok(Lotto {
+            bit_lotto_numbers: bits,
+        })
     }
 
     pub fn generate_random_lottos(amount: i64) -> Vec<Lotto> {
@@ -54,36 +44,50 @@ impl Lotto {
 
     fn generate_by_random() -> Lotto {
         let mut rng = rand::thread_rng();
-        // let mut vec: Vec<i8> = Vec::new();
-        let mut vec = [0i8; 6];
+        let mut bits: i64 = 0;
 
-        for i in 0..6 {
+        let mut count = 0;
+        while count < 6 {
             let rand_number = rng.gen_range(1..=45);
-            if vec.contains(&rand_number) {
+            if bits & (1 << rand_number) != 0 {
                 continue;
             }
-            vec[i] = rand_number;
+            bits = bits | 1 << rand_number;
+            count += 1;
         }
-        // while vec.len() != 6 {
-        //     let rand_number = rng.gen_range(1..=45);
-        //     if vec.contains(&rand_number) {
-        //         continue;
-        //     }
-        //     vec.push(rand_number);
-        // }
-        vec.sort();
-        Lotto { lotto_numbers: vec }
+        Lotto {
+            bit_lotto_numbers: bits,
+        }
     }
 
     fn join_by_delimiter(&self) -> String {
-        let joined = self
-            .lotto_numbers
+        // 1~45까지 shift한 값이 0이 아니면, 문자열에 추가한다.
+        let mut numbers = [0i8; 6];
+
+        let mut i = 0;
+        let mut expr = 1;
+        while i < 6 {
+            if self.bit_lotto_numbers & (1 << expr) != 0 {
+                numbers[i] = expr;
+                i += 1;
+            }
+            expr += 1;
+        }
+
+        let joined = numbers
             .iter()
             .map(|num| num.to_string())
             .collect::<Vec<String>>()
             .join(", ");
 
         joined
+    }
+    pub fn contains(&self, number: &i64) -> bool {
+        self.bit_lotto_numbers & number != 0
+    }
+
+    pub fn get_count(&self, target: &Lotto) -> u32 {
+        (self.bit_lotto_numbers & target.bit_lotto_numbers).count_ones()
     }
 }
 

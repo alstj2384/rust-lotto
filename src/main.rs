@@ -35,7 +35,7 @@ fn format_mem(opt: Option<u64>) -> String {
 }
 
 fn lotto_runtime_size() -> usize {
-    size_of::<[i8; 6]>()
+    size_of::<u64>()
 }
 
 fn get_max_purchase_amount(free_memory: u64, size: u64, padding: u64, lotto_price: u64) -> u64 {
@@ -78,26 +78,35 @@ fn main() {
     let mem_used = read_value("/sys/fs/cgroup/memory.current");
     println!("Memory Used:   {}", format_mem(mem_used));
 
-    // 객체 생성 이후 남은 메모리 공간
+    // // 객체 생성 이후 남은 메모리 공간
     println!(
         "Memory left:   {}",
         format_mem(Option::Some(mem_limit.unwrap() - mem_used.unwrap()))
     );
 
-    // let winning_lotto = input_winning_lotto();
+    let winning_lotto = input_winning_lotto();
 
-    // let mut result: HashMap<Prize, i32> = HashMap::new();
-    // for lotto in lottos {
-    //     let (match_count, is_bonus_correct) = winning_lotto.get_result(lotto);
+    // 처리 시간 측정
+    let start = Instant::now();
+    let lottos = Lotto::generate_random_lottos(lotto_amount);
 
-    //     let prize = Prize::get_prize(match_count, is_bonus_correct);
+    let mut result: HashMap<Prize, i32> = HashMap::new();
+    for lotto in lottos {
+        let (match_count, is_bonus_correct) = winning_lotto.get_result(lotto);
 
-    //     let count = result.entry(prize).or_insert(0);
-    //     *count += 1
-    // }
+        let prize = Prize::get_prize(match_count, is_bonus_correct);
 
-    // io::show_result(&result);
-    // io::show_profit_rate(&result, money as f64);
+        let count = result.entry(prize).or_insert(0);
+        *count += 1
+    }
+
+    let duration = start.elapsed();
+
+    let ms = duration.as_millis();
+    let sec = duration.as_secs_f64();
+    println!("정답 처리 소요 시간: {} ms ({} s)", ms, sec);
+    io::show_result(&result);
+    io::show_profit_rate(&result, money as f64);
 }
 
 fn input_purchase_amount() -> i64 {
