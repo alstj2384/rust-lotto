@@ -54,23 +54,16 @@ impl Lotto {
 
     fn generate_by_random() -> Lotto {
         let mut rng = rand::thread_rng();
-        // let mut vec: Vec<i8> = Vec::new();
         let mut vec = [0i8; 6];
-
-        for i in 0..6 {
+        let mut i = 0;
+        while i < 6 {
             let rand_number = rng.gen_range(1..=45);
             if vec.contains(&rand_number) {
                 continue;
             }
             vec[i] = rand_number;
+            i += 1;
         }
-        // while vec.len() != 6 {
-        //     let rand_number = rng.gen_range(1..=45);
-        //     if vec.contains(&rand_number) {
-        //         continue;
-        //     }
-        //     vec.push(rand_number);
-        // }
         vec.sort();
         Lotto { lotto_numbers: vec }
     }

@@ -9,7 +9,7 @@ pub enum Prize {
 }
 
 impl Prize {
-    pub fn get_prize(match_count: u32, is_bonus_correct: bool) -> Prize {
+    pub fn get_prize(match_count: i32, is_bonus_correct: bool) -> Prize {
         if match_count == 6 {
             return Prize::First;
         } else if match_count == 5 && is_bonus_correct {
@@ -25,7 +25,7 @@ impl Prize {
         }
     }
 
-    pub fn get_sum(prize: &Prize, count: &i32) -> i32 {
+    pub fn get_sum(prize: &Prize, count: &i64) -> i64 {
         match prize {
             Prize::First => 2_000_000_000 * count,
             Prize::Second => 30_000_000 * count,

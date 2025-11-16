@@ -84,20 +84,20 @@ fn main() {
         format_mem(Option::Some(mem_limit.unwrap() - mem_used.unwrap()))
     );
 
-    // let winning_lotto = input_winning_lotto();
+    let winning_lotto = input_winning_lotto();
 
-    // let mut result: HashMap<Prize, i32> = HashMap::new();
-    // for lotto in lottos {
-    //     let (match_count, is_bonus_correct) = winning_lotto.get_result(lotto);
+    let mut result: HashMap<Prize, i64> = HashMap::new();
+    for lotto in lottos {
+        let (match_count, is_bonus_correct) = winning_lotto.get_result(lotto);
 
-    //     let prize = Prize::get_prize(match_count, is_bonus_correct);
+        let prize = Prize::get_prize(match_count, is_bonus_correct);
 
-    //     let count = result.entry(prize).or_insert(0);
-    //     *count += 1
-    // }
+        let count = result.entry(prize).or_insert(0);
+        *count += 1
+    }
 
-    // io::show_result(&result);
-    // io::show_profit_rate(&result, money as f64);
+    io::show_result(&result);
+    io::show_profit_rate(&result, money as f64);
 }
 
 fn input_purchase_amount() -> i64 {

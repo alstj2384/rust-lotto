@@ -86,7 +86,7 @@ pub fn show_purchased_lotto(lottos: &Vec<Lotto>) {
     println!();
 }
 
-pub fn show_result(result: &HashMap<Prize, i32>) {
+pub fn show_result(result: &HashMap<Prize, i64>) {
     println!("당첨 통계");
     println!("---");
     println!(
@@ -121,8 +121,8 @@ pub fn show_result(result: &HashMap<Prize, i32>) {
     );
 }
 
-pub fn show_profit_rate(result: &HashMap<Prize, i32>, money: f64) {
-    let mut sum: i32 = 0;
+pub fn show_profit_rate(result: &HashMap<Prize, i64>, money: f64) {
+    let mut sum: i64 = 0;
     for prize in result {
         sum += Prize::get_sum(prize.0, prize.1);
     }
