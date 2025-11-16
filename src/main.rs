@@ -35,10 +35,6 @@ fn format_mem(opt: Option<u64>) -> String {
     }
 }
 
-fn lotto_runtime_size() -> usize {
-    size_of::<[i8; 6]>()
-}
-
 fn get_max_purchase_amount(free_memory: u64, size: u64, padding: u64, lotto_price: u64) -> u64 {
     free_memory / size * padding / 100 * lotto_price
 }
@@ -104,6 +100,13 @@ fn main() {
         "Memory left:   {}",
         format_mem(Option::Some(mem_limit.unwrap() - mem_used.unwrap()))
     );
+
+    // let swap_current = read_value("/sys/fs/cgroup/memory.swap.current");
+
+    // println!(
+    //     "Swap Memory current (after Vec<Lotto>: {}",
+    //     format_mem(swap_current)
+    // );
 
     // let winning_lotto = input_winning_lotto();
 
