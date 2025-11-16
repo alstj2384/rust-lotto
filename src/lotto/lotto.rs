@@ -35,7 +35,7 @@ impl Lotto {
     }
 
     pub fn generate_random_lottos(amount: i64) -> Vec<Lotto> {
-        let mut lottos: Vec<Lotto> = Vec::with_capacity(amount as usize);
+        let mut lottos: Vec<Lotto> = Vec::new();
         while lottos.len() != amount.try_into().unwrap() {
             lottos.push(Lotto::generate_by_random());
         }

@@ -18,7 +18,7 @@ pub fn input_purchase_amount() -> Result<i64, String> {
         }
     };
 
-    if money <= 0 || money > 1_000_000_000_000_000 {
+    if money <= 0 || money > 1_000_000_000_000 {
         return Err("[ERROR] 구매 금액은 0원부터 10억 사이여야 합니다.".to_string());
     }
 
