@@ -1,5 +1,9 @@
-use crate::Lotto;
+use crate::{
+    Lotto,
+    lotto::lotto::{INVALID_LOTTO_RANGE, MAX_LOTTO_RANGE, MIN_LOTTO_RANGE},
+};
 
+const DUPLICATED_BONUS_NUMBER: &str = "[ERROR] 보너스 번호는 로또 번호와 중복될 수 없습니다.";
 pub struct WinningLotto {
     winning_numbers: Lotto,
     bonus_number: BonusNumber,
@@ -11,8 +15,8 @@ pub struct BonusNumber {
 
 impl BonusNumber {
     pub fn new(bonus_number: i8) -> Result<BonusNumber, String> {
-        if bonus_number < 1 || bonus_number > 45 {
-            return Err("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.".to_string());
+        if bonus_number < MIN_LOTTO_RANGE || bonus_number > MAX_LOTTO_RANGE {
+            return Err(INVALID_LOTTO_RANGE.to_string());
         }
         Ok(BonusNumber {
             bonus_number: bonus_number,
@@ -27,7 +31,7 @@ impl BonusNumber {
 impl WinningLotto {
     pub fn new(lotto: Lotto, bonus_number: BonusNumber) -> Result<WinningLotto, String> {
         if lotto.contains(bonus_number.bonus_number()) {
-            return Err("[ERROR] 보너스 번호는 로또 번호와 중복될 수 없습니다.".to_string());
+            return Err(DUPLICATED_BONUS_NUMBER.to_string());
         }
         Ok(WinningLotto {
             winning_numbers: lotto,

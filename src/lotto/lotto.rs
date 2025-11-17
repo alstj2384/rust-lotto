@@ -2,27 +2,34 @@ use rand::Rng;
 use std::fmt::Display;
 
 pub const LOTTO_PRICE: u64 = 1000;
+pub const LOTTO_SIZE: usize = 6;
+pub const MIN_LOTTO_RANGE: i8 = 1;
+pub const MAX_LOTTO_RANGE: i8 = 45;
+pub const INVALID_LOTTO_RANGE: &str = "[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.";
+pub const DUPLICATED_LOTTO_NUMBER: &str = "[ERROR] 로또 번호는 중복될 수 없습니다.";
+const INVALID_LOTTO_SIZE: &str = "[ERROR] 로또 번호는 6개여야 합니다.";
+const DELIMITER: &str = ", ";
 
 pub struct Lotto {
-    pub lotto_numbers: [i8; 6],
+    pub lotto_numbers: [i8; LOTTO_SIZE],
 }
 
 impl Lotto {
-    pub fn new(lotto_numbers: [i8; 6]) -> Result<Lotto, String> {
-        if lotto_numbers.len() != 6 {
-            return Err("[ERROR] 로또 번호는 6개여야 합니다.".to_string());
+    pub fn new(lotto_numbers: [i8; LOTTO_SIZE]) -> Result<Lotto, String> {
+        if lotto_numbers.len() != LOTTO_SIZE {
+            return Err(INVALID_LOTTO_SIZE.to_string());
         }
 
         for number in &lotto_numbers {
-            if number < &1 || number > &45 {
-                return Err("[ERROR] 로또 번호는 1부터 45 사이의 숫자여야 합니다.".to_string());
+            if number < &MIN_LOTTO_RANGE || number > &MAX_LOTTO_RANGE {
+                return Err(INVALID_LOTTO_RANGE.to_string());
             }
         }
 
-        for i in 0..lotto_numbers.len() {
-            for j in i + 1..lotto_numbers.len() {
+        for i in 0..LOTTO_SIZE {
+            for j in i + 1..LOTTO_SIZE {
                 if lotto_numbers.get(i) == lotto_numbers.get(j) {
-                    return Err("[ERROR] 로또 번호는 중복될 수 없습니다.".to_string());
+                    return Err(DUPLICATED_LOTTO_NUMBER.to_string());
                 }
             }
         }
@@ -56,10 +63,10 @@ impl Lotto {
 
     fn generate_by_random() -> Lotto {
         let mut rng = rand::thread_rng();
-        let mut vec = [0i8; 6];
+        let mut vec = [0i8; LOTTO_SIZE];
         let mut i = 0;
-        while i < 6 {
-            let rand_number = rng.gen_range(1..=45);
+        while i < LOTTO_SIZE {
+            let rand_number = rng.gen_range(MIN_LOTTO_RANGE..=MAX_LOTTO_RANGE);
             if vec.contains(&rand_number) {
                 continue;
             }
@@ -76,13 +83,13 @@ impl Lotto {
             .iter()
             .map(|num| num.to_string())
             .collect::<Vec<String>>()
-            .join(", ");
+            .join(DELIMITER);
 
         joined
     }
 
     pub fn size_in_bytes() -> u64 {
-        size_of::<[i8; 6]>() as u64
+        size_of::<[i8; LOTTO_SIZE]>() as u64
     }
 }
 

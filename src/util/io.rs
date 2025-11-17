@@ -3,9 +3,14 @@ use num_format::ToFormattedString;
 
 use crate::BonusNumber;
 use crate::Lotto;
+use crate::lotto::lotto::LOTTO_PRICE;
+use crate::lotto::lotto::LOTTO_SIZE;
 use crate::lotto::prize::Prize;
+use crate::util::system::MAX_PURCHASE_AMOUNT;
 use std::collections::HashMap;
 use std::io;
+
+const DELIMITER: &str = ",";
 
 pub fn input_purchase_amount() -> Result<u64, String> {
     println!("구매금액을 입력해 주세요.(0을 입력하면 최대 금액으로 구매합니다)");
@@ -21,12 +26,18 @@ pub fn input_purchase_amount() -> Result<u64, String> {
         }
     };
 
-    if money < 0 || money > 100_000_000_000 {
-        return Err("[ERROR] 구매 금액은 0원부터 100억 사이여야 합니다.".to_string());
+    if money < 0 || money > MAX_PURCHASE_AMOUNT {
+        return Err(format!(
+            "[ERROR] 구매 금액은 0원에서 {}원 미만이어야 합니다.",
+            MAX_PURCHASE_AMOUNT
+        ));
     }
 
     if money % 1000 != 0 {
-        return Err("[ERROR] 구매 금액은 1000원 단위여야 합니다.".to_string());
+        return Err(format!(
+            "[ERROR] 구매 금액은 {}원 단위여야 합니다.",
+            LOTTO_PRICE
+        ));
     }
     println!();
     Ok(money)
@@ -39,10 +50,9 @@ pub fn input_winning_lotto() -> Result<Lotto, String> {
         return Err("[ERROR] 잘못된 입력입니다.".to_string());
     }
 
-    let parsed = input.split(",");
+    let parsed = input.split(DELIMITER);
 
-    // let mut lotto_numbers: Vec<i8> = Vec::new();
-    let mut lotto_numbers = [0i8; 6];
+    let mut lotto_numbers = [0i8; LOTTO_SIZE];
 
     let mut i = 0;
     for number in parsed {
@@ -82,13 +92,6 @@ pub fn show_purchased_lotto_amount(lottos: &Vec<Lotto>) {
         "{}개를 구매했습니다.",
         lottos.len().to_formatted_string(&Locale::ko)
     );
-    println!();
-}
-
-pub fn show_purchased_lotto(lottos: &Vec<Lotto>) {
-    for lotto in lottos {
-        println!("{}", *lotto)
-    }
     println!();
 }
 
@@ -139,15 +142,6 @@ pub fn show_profit_rate(result: &HashMap<Prize, i64>, money: f64) {
     );
 }
 
-fn format_mem(bytes: u64) -> String {
-    format!(
-        "{} B / {} KB / {} MB",
-        bytes,
-        bytes / 1024,
-        bytes / 1024 / 1024
-    )
-}
-
 pub fn show_memory_information(system_infos: (String, u64, u64, u64)) {
     println!("현재 실행중인 운영체제: {}", system_infos.0);
     println!();
@@ -160,4 +154,17 @@ pub fn show_memory_information(system_infos: (String, u64, u64, u64)) {
         system_infos.3.to_formatted_string(&Locale::ko)
     );
     println!();
+}
+
+pub fn show_duration(ms: u128, sec: f64) {
+    println!("생성 소요 시간: {} ms ({} s)", ms, sec);
+}
+
+fn format_mem(bytes: u64) -> String {
+    format!(
+        "{} B / {} KB / {} MB",
+        bytes,
+        bytes / 1024,
+        bytes / 1024 / 1024
+    )
 }
