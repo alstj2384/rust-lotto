@@ -1,5 +1,10 @@
 use rand::Rng;
-use std::{fmt::Display, sync::mpsc, thread, time::Instant};
+use std::{
+    fmt::Display,
+    sync::mpsc,
+    thread::{self, JoinHandle},
+    time::Instant,
+};
 
 pub const LOTTO_PRICE: u64 = 1000;
 pub const LOTTO_SIZE: usize = 6;
@@ -53,31 +58,35 @@ impl Lotto {
         count
     }
 
-    pub fn generate_random_lottos(amount: u64) -> Vec<Lotto> {
-        let val = amount / 3;
-        let res = amount % 3;
+    pub fn generate_random_lottos(amount: u64, threads: i32) -> Vec<Lotto> {
+        let mut lottos = Vec::with_capacity(amount as usize);
+        let val = amount / threads as u64;
+        let res = amount % threads as u64;
 
-        let join1 = thread::spawn(move || {
-            (0..val)
-                .map(|_| Lotto::generate_by_random())
-                .collect::<Vec<Lotto>>()
-        });
+        let mut handles: Vec<JoinHandle<Vec<Lotto>>> = Vec::new();
+        let mut loops: Vec<i32> = Vec::new();
 
-        let join2 = thread::spawn(move || {
-            (0..val)
-                .map(|_| Lotto::generate_by_random())
-                .collect::<Vec<Lotto>>()
-        });
+        if threads <= 1 {
+            return (0..amount).map(|_| Lotto::generate_by_random()).collect();
+        }
+        for l in 0..threads - 1 {
+            loops.push(val as i32);
+        }
+        loops.push((val + res) as i32);
 
-        let join3 = thread::spawn(move || {
-            (0..val + res)
-                .map(|_| Lotto::generate_by_random())
-                .collect::<Vec<Lotto>>()
-        });
+        for val in loops {
+            let handle = thread::spawn(move || {
+                (0..val)
+                    .into_iter()
+                    .map(|_| Lotto::generate_by_random())
+                    .collect()
+            });
+            handles.push(handle);
+        }
 
-        let mut lottos = join1.join().unwrap();
-        lottos.extend(join2.join().unwrap());
-        lottos.extend(join3.join().unwrap());
+        for handle in handles {
+            lottos.extend(handle.join().unwrap());
+        }
 
         lottos
     }

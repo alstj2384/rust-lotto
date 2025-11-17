@@ -6,6 +6,7 @@ use lotto::prize::Prize;
 use lotto::winning::BonusNumber;
 use lotto::winning::WinningLotto;
 use std::collections::HashMap;
+use std::io::stdin;
 use std::thread;
 use std::time::Duration;
 use std::time::Instant;
@@ -26,9 +27,16 @@ fn main() {
 
     let lotto_amount = money / 1000;
 
+    println!("사용할 스레드 개수를 입력해주세요");
+    let mut input = String::new();
+    stdin().read_line(&mut input).expect("잘못된 입력입니다.");
+    let threads = input
+        .trim()
+        .parse::<i32>()
+        .expect("숫자를 입력해야 합니다.");
     // 처리 시간 측정
     let start = Instant::now();
-    let lottos = Lotto::generate_random_lottos(lotto_amount);
+    let lottos = Lotto::generate_random_lottos(lotto_amount, threads);
     let duration = start.elapsed();
 
     let ms = duration.as_millis();
