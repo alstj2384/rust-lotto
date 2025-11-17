@@ -1,6 +1,8 @@
 use rand::Rng;
 use std::fmt::Display;
 
+pub const LOTTO_PRICE: u64 = 1000;
+
 pub struct Lotto {
     pub lotto_numbers: [i8; 6],
 }
@@ -44,7 +46,7 @@ impl Lotto {
         count
     }
 
-    pub fn generate_random_lottos(amount: i64) -> Vec<Lotto> {
+    pub fn generate_random_lottos(amount: u64) -> Vec<Lotto> {
         let mut lottos: Vec<Lotto> = Vec::with_capacity(amount as usize);
         while lottos.len() != amount.try_into().unwrap() {
             lottos.push(Lotto::generate_by_random());
@@ -77,6 +79,10 @@ impl Lotto {
             .join(", ");
 
         joined
+    }
+
+    pub fn size_in_bytes() -> u64 {
+        size_of::<[i8; 6]>() as u64
     }
 }
 

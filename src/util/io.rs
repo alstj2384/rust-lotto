@@ -1,25 +1,28 @@
+use num_format::Locale;
+use num_format::ToFormattedString;
+
 use crate::BonusNumber;
 use crate::Lotto;
 use crate::lotto::prize::Prize;
 use std::collections::HashMap;
 use std::io;
 
-pub fn input_purchase_amount() -> Result<i64, String> {
-    println!("구매금액을 입력해 주세요.");
+pub fn input_purchase_amount() -> Result<u64, String> {
+    println!("구매금액을 입력해 주세요.(0을 입력하면 최대 금액으로 구매합니다)");
     let mut input = String::new();
     if let Err(_e) = io::stdin().read_line(&mut input) {
         return Err("[ERROR] 잘못된 입력입니다.".to_string());
     }
 
-    let money: i64 = match input.trim().parse::<i64>() {
+    let money: u64 = match input.trim().parse::<u64>() {
         Ok(value) => value,
         Err(_e) => {
             return Err("[ERROR] 구매 금액은 숫자만 입력할 수 있습니다.".to_string());
         }
     };
 
-    if money <= 0 || money > 1_000_000_000_000_000 {
-        return Err("[ERROR] 구매 금액은 0원부터 10억 사이여야 합니다.".to_string());
+    if money < 0 || money > 100_000_000_000 {
+        return Err("[ERROR] 구매 금액은 0원부터 100억 사이여야 합니다.".to_string());
     }
 
     if money % 1000 != 0 {
@@ -67,7 +70,6 @@ pub fn input_bonus_lotto() -> Result<BonusNumber, String> {
         Ok(value) => value,
         Err(_e) => return Err("[ERROR] 보너스 번호는 숫자만 입력해야 합니다.".to_string()),
     };
-
     println!();
     match BonusNumber::new(bonus_number) {
         Ok(value) => Ok(value),
@@ -76,7 +78,11 @@ pub fn input_bonus_lotto() -> Result<BonusNumber, String> {
 }
 
 pub fn show_purchased_lotto_amount(lottos: &Vec<Lotto>) {
-    println!("{}개를 구매했습니다.", lottos.len());
+    println!(
+        "{}개를 구매했습니다.",
+        lottos.len().to_formatted_string(&Locale::ko)
+    );
+    println!();
 }
 
 pub fn show_purchased_lotto(lottos: &Vec<Lotto>) {
@@ -131,4 +137,27 @@ pub fn show_profit_rate(result: &HashMap<Prize, i64>, money: f64) {
         "총 수익률은 {:.1}%입니다.",
         sum as f64 / money as f64 * 100.0
     );
+}
+
+fn format_mem(bytes: u64) -> String {
+    format!(
+        "{} B / {} KB / {} MB",
+        bytes,
+        bytes / 1024,
+        bytes / 1024 / 1024
+    )
+}
+
+pub fn show_memory_information(system_infos: (String, u64, u64, u64)) {
+    println!("현재 실행중인 운영체제: {}", system_infos.0);
+    println!();
+    println!("총 메모리: {}", format_mem(system_infos.1));
+    println!("사용 가능한 메모리: {}", format_mem(system_infos.2));
+    println!();
+
+    println!(
+        "최대 구매 가능 금액: {}원 (사용 가능 메모리 기반)",
+        system_infos.3.to_formatted_string(&Locale::ko)
+    );
+    println!();
 }
