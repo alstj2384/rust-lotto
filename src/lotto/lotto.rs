@@ -53,50 +53,31 @@ impl Lotto {
         count
     }
 
-    // pub fn generate_random_lottos(amount: u64) -> Vec<Lotto> {
-    //     let start = Instant::now();
-    //     let mut lottos: Vec<Lotto> = Vec::with_capacity(amount as usize);
-    //     while lottos.len() != amount.try_into().unwrap() {
-    //         lottos.push(Lotto::generate_by_random());
-    //     }
-
-    //     let duration = start.elapsed();
-
-    //     let ms = duration.as_millis();
-    //     let sec = duration.as_secs_f64();
-    //     crate::io::show_duration(ms, sec);
-    //     println!("위에가 생성 시간");
-    //     lottos
-    // }
     pub fn generate_random_lottos(amount: u64) -> Vec<Lotto> {
-        let mut lottos: Vec<Lotto> = Vec::with_capacity(amount as usize);
-        let (tx, rx) = mpsc::channel();
-
-        let val = amount / 2;
-        let res = amount % 2;
-        println!("val = {}", val);
-        let tx1 = tx.clone();
+        let val = amount / 3;
+        let res = amount % 3;
 
         let join1 = thread::spawn(move || {
-            for _ in 0..val {
-                let lotto = Lotto::generate_by_random();
-                tx.send(lotto).unwrap();
-            }
+            (0..val)
+                .map(|_| Lotto::generate_by_random())
+                .collect::<Vec<Lotto>>()
         });
 
         let join2 = thread::spawn(move || {
-            for _ in 0..val + res {
-                let lotto = Lotto::generate_by_random();
-                tx1.send(lotto).unwrap();
-            }
+            (0..val)
+                .map(|_| Lotto::generate_by_random())
+                .collect::<Vec<Lotto>>()
         });
 
-        join1.join().unwrap();
-        join2.join().unwrap();
+        let join3 = thread::spawn(move || {
+            (0..val + res)
+                .map(|_| Lotto::generate_by_random())
+                .collect::<Vec<Lotto>>()
+        });
 
-        for receive in rx {
-            lottos.push(receive);
-        }
+        let mut lottos = join1.join().unwrap();
+        lottos.extend(join2.join().unwrap());
+        lottos.extend(join3.join().unwrap());
 
         lottos
     }

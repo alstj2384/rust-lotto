@@ -5,7 +5,7 @@ use std::cmp::min;
 use sysinfo::{MemoryRefreshKind, RefreshKind, System};
 
 const PADDING: u64 = 80;
-pub const MAX_PURCHASE_AMOUNT: u64 = 1_000_000_000_000;
+pub const MAX_PURCHASE_AMOUNT: u64 = 1_000_000_000_000_000;
 
 pub fn get_memories_by_os() -> (String, u64, u64, u64) {
     let (os, total_memory, available_memory) = match std::env::consts::OS {
