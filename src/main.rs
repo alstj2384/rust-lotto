@@ -37,21 +37,21 @@ fn main() {
 
     show_purchased_lotto_amount(&lottos);
 
-    let winning_lotto = input_winning_lotto();
+    // let winning_lotto = input_winning_lotto();
 
-    let mut result: HashMap<Prize, i64> = HashMap::new();
-    for lotto in lottos {
-        let (match_count, is_bonus_correct) = winning_lotto.get_result(lotto);
+    // let mut result: HashMap<Prize, i64> = HashMap::new();
+    // for lotto in lottos {
+    //     let (match_count, is_bonus_correct) = winning_lotto.get_result(lotto);
 
-        let prize = Prize::get_prize(match_count, is_bonus_correct);
+    //     let prize = Prize::get_prize(match_count, is_bonus_correct);
 
-        let count = result.entry(prize).or_insert(0);
-        *count += 1
-    }
+    //     let count = result.entry(prize).or_insert(0);
+    //     *count += 1
+    // }
 
-    io::show_result(&result);
-    io::show_profit_rate(&result, money as f64);
-    thread::sleep(Duration::from_secs(5));
+    // io::show_result(&result);
+    // io::show_profit_rate(&result, money as f64);
+    // thread::sleep(Duration::from_secs(5));
 }
 
 fn input_purchase_amount() -> u64 {
