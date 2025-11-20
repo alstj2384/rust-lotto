@@ -4,8 +4,10 @@ use crate::lotto::lotto::{LOTTO_PRICE, Lotto};
 use std::cmp::min;
 use sysinfo::{MemoryRefreshKind, RefreshKind, System};
 
-const PADDING: u64 = 80;
-pub const MAX_PURCHASE_AMOUNT: u64 = 1_000_000_000_000_000;
+const PADDING: u64 = 60;
+pub const MAX_PURCHASE_AMOUNT: u64 = 10_000_000_000;
+const LINUX_MEMORY_CURRENT_PATH: &str = "/sys/fs/cgroup/memory.current";
+const LINUX_MEMORY_MAX_PATH: &str = "/sys/fs/cgroup/memory.max";
 
 pub fn get_memories_by_os() -> (String, u64, u64, u64) {
     let (os, total_memory, available_memory) = match std::env::consts::OS {
@@ -17,6 +19,13 @@ pub fn get_memories_by_os() -> (String, u64, u64, u64) {
 
     let max_purchase_amount = get_max_purchase_amount(available_memory);
     (os, total_memory, available_memory, max_purchase_amount)
+}
+
+fn get_linux_sys_info() -> (String, u64, u64) {
+    let mem_used = read_value(LINUX_MEMORY_CURRENT_PATH);
+    let mem_limit = read_value(LINUX_MEMORY_MAX_PATH);
+
+    ("Linux".to_string(), mem_limit, mem_limit - mem_used)
 }
 
 fn get_mac_sys_info() -> (String, u64, u64) {
@@ -41,13 +50,6 @@ fn get_win_sys_info() -> (String, u64, u64) {
     )
 }
 
-fn get_linux_sys_info() -> (String, u64, u64) {
-    let mem_used = read_value("/sys/fs/cgroup/memory.current");
-    let mem_limit = read_value("/sys/fs/cgroup/memory.max");
-
-    ("Linux".to_string(), mem_limit, mem_limit - mem_used)
-}
-
 fn read_value(path: &str) -> u64 {
     let data = fs::read_to_string(path)
         .expect("memory 파일 읽기에 실패했습니다")
@@ -55,7 +57,7 @@ fn read_value(path: &str) -> u64 {
         .to_string();
 
     if data == "max" {
-        return u64::MAX; // unlimited
+        return u64::MAX;
     }
 
     data.parse::<u64>().expect("메모리 값 변환에 실패했습니다")

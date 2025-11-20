@@ -13,21 +13,6 @@ pub struct BonusNumber {
     bonus_number: i8,
 }
 
-impl BonusNumber {
-    pub fn new(bonus_number: i8) -> Result<BonusNumber, String> {
-        if bonus_number < MIN_LOTTO_RANGE || bonus_number > MAX_LOTTO_RANGE {
-            return Err(INVALID_LOTTO_RANGE.to_string());
-        }
-        Ok(BonusNumber {
-            bonus_number: bonus_number,
-        })
-    }
-
-    fn bonus_number(&self) -> &i8 {
-        &self.bonus_number
-    }
-}
-
 impl WinningLotto {
     pub fn new(lotto: Lotto, bonus_number: BonusNumber) -> Result<WinningLotto, String> {
         if lotto.contains(bonus_number.bonus_number()) {
@@ -46,5 +31,20 @@ impl WinningLotto {
             .contains(self.bonus_number.bonus_number());
 
         (count, is_bonus_correct)
+    }
+}
+
+impl BonusNumber {
+    pub fn new(bonus_number: i8) -> Result<BonusNumber, String> {
+        if bonus_number < MIN_LOTTO_RANGE || bonus_number > MAX_LOTTO_RANGE {
+            return Err(INVALID_LOTTO_RANGE.to_string());
+        }
+        Ok(BonusNumber {
+            bonus_number: bonus_number,
+        })
+    }
+
+    fn bonus_number(&self) -> &i8 {
+        &self.bonus_number
     }
 }

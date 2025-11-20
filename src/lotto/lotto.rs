@@ -1,9 +1,7 @@
 use rand::Rng;
 use std::{
     fmt::Display,
-    sync::mpsc,
     thread::{self, JoinHandle},
-    time::Instant,
 };
 
 pub const LOTTO_PRICE: u64 = 1000;
@@ -58,37 +56,40 @@ impl Lotto {
         count
     }
 
-    pub fn generate_random_lottos(amount: u64, threads: i32) -> Vec<Lotto> {
-        let mut lottos = Vec::with_capacity(amount as usize);
-        let val = amount / threads as u64;
-        let res = amount % threads as u64;
-
-        let mut handles: Vec<JoinHandle<Vec<Lotto>>> = Vec::new();
-        let mut loops: Vec<i32> = Vec::new();
-
+    pub fn generate_random_lottos(amount: u64, threads: u32) -> Vec<Lotto> {
+        // 싱글 스레드 처리
         if threads <= 1 {
             return (0..amount).map(|_| Lotto::generate_by_random()).collect();
         }
-        for l in 0..threads - 1 {
-            loops.push(val as i32);
-        }
-        loops.push((val + res) as i32);
 
-        for val in loops {
-            let handle = thread::spawn(move || {
-                (0..val)
-                    .into_iter()
-                    .map(|_| Lotto::generate_by_random())
-                    .collect()
-            });
+        let mut lottos = Vec::with_capacity(amount as usize);
+        let val = amount / threads as u64;
+        let remainder = amount % threads as u64;
+
+        let mut handles: Vec<JoinHandle<Vec<Lotto>>> = Vec::new();
+
+        // 생성을 설정된 스레드가 병렬 처리
+        for i in 0..threads {
+            let count = if i == threads - 1 {
+                val + remainder
+            } else {
+                val
+            };
+            let handle =
+                thread::spawn(move || (0..count).map(|_| Lotto::generate_by_random()).collect());
             handles.push(handle);
         }
 
+        // 결과물을 병합
         for handle in handles {
             lottos.extend(handle.join().unwrap());
         }
 
         lottos
+    }
+
+    pub fn size_in_bytes() -> u64 {
+        size_of::<[i8; LOTTO_SIZE]>() as u64
     }
 
     fn generate_by_random() -> Lotto {
@@ -116,10 +117,6 @@ impl Lotto {
             .join(DELIMITER);
 
         joined
-    }
-
-    pub fn size_in_bytes() -> u64 {
-        size_of::<[i8; LOTTO_SIZE]>() as u64
     }
 }
 
