@@ -18,7 +18,7 @@ pub struct Lotto {
 }
 
 impl Lotto {
-    pub fn new(lotto_numbers: [i8; LOTTO_SIZE]) -> Result<Lotto, String> {
+    pub fn new(lotto_numbers: Vec<i8>) -> Result<Lotto, String> {
         if lotto_numbers.len() != LOTTO_SIZE {
             return Err(INVALID_LOTTO_SIZE.to_string());
         }
@@ -37,8 +37,10 @@ impl Lotto {
             }
         }
 
+        let numbers = lotto_numbers.try_into().unwrap();
+
         Ok(Lotto {
-            lotto_numbers: lotto_numbers,
+            lotto_numbers: numbers,
         })
     }
 
@@ -120,6 +122,7 @@ impl Lotto {
     }
 }
 
+// 로또 번호 출력을 위한 Display 트레이트 구현
 impl Display for Lotto {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let joined = self.join_by_delimiter();
