@@ -55,9 +55,6 @@ fn main() {
     }
     io::show_result(&result);
     io::show_profit_rate(&result, money as f64);
-
-    // Windows에서 실행파일로 실행할 경우, 바로 종료되는 것을 방지
-    thread::sleep(Duration::from_secs(5));
 }
 
 fn input_purchase_amount() -> u64 {

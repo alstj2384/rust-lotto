@@ -5,7 +5,7 @@ use std::cmp::min;
 use sysinfo::{MemoryRefreshKind, RefreshKind, System};
 
 const PADDING: u64 = 60;
-pub const MAX_PURCHASE_AMOUNT: u64 = 100_000_000_000;
+pub const MAX_PURCHASE_AMOUNT: u64 = 200_000_000_000;
 const LINUX_MEMORY_CURRENT_PATH: &str = "/sys/fs/cgroup/memory.current";
 const LINUX_MEMORY_MAX_PATH: &str = "/sys/fs/cgroup/memory.max";
 
